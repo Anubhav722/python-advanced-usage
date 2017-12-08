@@ -13,38 +13,63 @@
 
 import sqlite3
 
+
 def Main():
-	try:
-		con = sqlite3.connect('test.db')
-		cur = con.cursor()
-		# cur.execute('SELECT SQLITE_VERSION()')
-		cur.execute("CREATE TABLE Pets(id INT, Name TEXT, Price INT)")
-		cur.execute("INSERT INTO Pets VALUES(1, 'Cat', 4000)")
-		cur.execute("INSERT INTO Pets VALUES(2, 'Rabbit', 1000)")
-		cur.execute("INSERT INTO Pets VALUES(3, 'Dog', 10000)")
-		cur.execute("INSERT INTO Pets VALUES(4, 'Monkey', 2000)")
+    try:
+        con = sqlite3.connect('test.db')
+        cur = con.cursor()
 
-		con.commit()
+        cur.executescript("""DROP TABLE IF EXISTS Pets;
+                         CREATE TABLE Pets(id INT, Name TEXT, Price INT);
+                         INSERT INTO Pets VALUES(1, 'Cat', 4000);
+                         INSERT INTO Pets VALUES(2, 'Rabbit', 1000);""")
 
-		cur.execute("SELECT * FROM Pets")
+        pets = ((3, 'Dog', 10000),
+                (4, 'Monkey', 2000),
+                (5, 'Bird', 1200))
 
-		data = cur.fetchall()
-		# data = cur.fetchone()
-		# print(data)
+        cur.executemany("INSERT INTO Pets VALUES(?,?,?)", pets)
 
-		for row in data:
-			print(row)
+        # will replace these statements with one.
+        # cur.execute('SELECT SQLITE_VERSION()')
+        # cur.execute("CREATE TABLE Pets(id INT, Name TEXT, Price INT)")
+        # cur.execute("INSERT INTO Pets VALUES(1, 'Cat', 4000)")
+        # cur.execute("INSERT INTO Pets VALUES(2, 'Rabbit', 1000)")
+        # cur.execute("INSERT INTO Pets VALUES(3, 'Dog', 10000)")
+        # cur.execute("INSERT INTO Pets VALUES(4, 'Monkey', 2000)")
 
-		con.close()
+        con.commit()
 
-	except sqlite3.Error:
-		if con:
-			print("Error! rolling back")
-			con.rollback()
+        cur.execute("SELECT * FROM Pets")
 
-	finally:
-		if con:
-			con.close()
+        data = cur.fetchall()
+        # data = cur.fetchone()
+        # print(data)
+
+        for row in data:
+            print(row)
+
+        con.close()
+
+    except sqlite3.Error:
+        if con:
+            print("Error! rolling back")
+            con.rollback()
+
+    finally:
+        if con:
+            con.close()
 
 if __name__ == '__main__':
-	Main()
+    Main()
+
+
+# Multiple Queries
+# The python database standard supports making multiple queries with one command.
+# This can either be done through the executescript() method.
+# which takes  a string of sql statements separated by a ';' semi-colon.
+
+# Or we can use the parameterized sql statement executemany(template, data)
+# This takes a string template of the query as the first argument
+# and then a tuple of tuples of the data to use with the argument
+# e.g. Executemany("INSERT INTO Pets VALUES(?, ?, ?)", data)
