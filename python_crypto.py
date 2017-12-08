@@ -119,3 +119,11 @@ def Main():
 
 if __name__ == '__main__':
 	Main()
+
+
+# NOTE:
+# Not all of ciphers and hashes in pycrpto library are considered safe.
+# Make sure you atleast look up the correct algorithm to be using for situation.
+# All of the algorithms are open source
+Never try to create your own algorithm unless you know what you are doing
+and have a team of experts.
